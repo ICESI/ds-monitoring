@@ -3,7 +3,7 @@
     "handlers": {
         "slack": {
             "type": "pipe",
-            "command": "/usr/local/bin/handler-slack.rb -j slack-integration",
+            "command": "/opt/sensu/embedded/bin/ruby /opt/sensu/embedded/lib/ruby/gems/2.4.0/gems/sensu-plugins-slack-1.0.0/bin/handler-slack.rb -j slack-integration",
             "severites": ["warning", "unknown"]
         }
     },
