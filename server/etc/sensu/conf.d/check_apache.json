@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "apache_check": {
+      "command": "/opt/sensu/embedded/bin/ruby /etc/sensu/plugins/check-apache.rb",
+      "interval": 15,
+      "handlers": ["slack"],
+      "subscribers": ["webservers"]
+    }
+  }
+}

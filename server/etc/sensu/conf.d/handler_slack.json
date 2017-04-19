@@ -1,0 +1,14 @@
+
+{
+    "handlers": {
+        "slack": {
+            "type": "pipe",
+            "command": "/usr/local/bin/handler-slack.rb -j slack-integration",
+            "severites": ["warning", "unknown"]
+        }
+    },
+    "slack-integration": {
+        "webhook_url": "https://hooks.slack.com/services/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", 
+        "template" : ""
+    }
+} 

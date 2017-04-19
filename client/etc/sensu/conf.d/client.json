@@ -1,0 +1,8 @@
+{
+  "client": {
+    "name": "centos-client1",
+    "address": "192.168.56.101",
+    "subscriptions": ["webservers"]
+  }
+}
+
