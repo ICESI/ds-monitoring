@@ -23,6 +23,6 @@ enabled=1' | sudo tee /etc/yum.repos.d/sensu.repo
       rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
       yum install uchiwa -y
       firewall-cmd --zone=public --add-port=5672/tcp --permanent
-      firewall-cmd --reload
       firewall-cmd --zone=public --add-port=15672/tcp --permanent
+      firewall-cmd --zone=public --add-port=3000/tcp --permanent
       firewall-cmd --reload
