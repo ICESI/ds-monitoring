@@ -10,6 +10,7 @@ enabled=1' | sudo tee /etc/yum.repos.d/sensu.repo
       su -c 'rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm'
       yum install erlang -y
       yum install redis -y
+      service redis start
       yum install socat -y
       su -c 'rpm -Uvh http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.9/rabbitmq-server-3.6.9-1.el7.noarch.rpm'
       service rabbitmq-server start
@@ -26,3 +27,4 @@ enabled=1' | sudo tee /etc/yum.repos.d/sensu.repo
       firewall-cmd --zone=public --add-port=15672/tcp --permanent
       firewall-cmd --zone=public --add-port=3000/tcp --permanent
       firewall-cmd --reload
+      service sensu-server restart & service sensu-api restart
