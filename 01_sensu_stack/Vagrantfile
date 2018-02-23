@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+  config.vm.define :rabbitmq-server do |queue|
+    queue.vm.box = "centos/7"
+    queue.vm.network :private_network, ip: "192.168.56.101"
+    #queue.vm.network "public_network", bridge: "eno1", ip:"192.168.131.100", netmask: "255.255.255.0"
+    queue.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "256","--cpus", "1", "--name", "rabbitmq-server" ]
+    end
+    queue.vm.provision "shell", path: "install-rabbitmq.sh"
+  end
+  config.vm.define :sensu_client do |producer|
+    producer.vm.box = "centos/7"
+    producer.vm.network :private_network, ip: "192.168.56.102"
+    #client.vm.network "public_network", bridge: "eno1", ip:"192.168.131.101", netmask: "255.255.255.0"
+    producer.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "256","--cpus", "1", "--name", "sensu_client" ]
+    end
+    producer.vm.provision "shell", path: "install-sensu-client.sh"
+  end
+  config.vm.define :sensu_server do |consumer|
+    consumer.vm.box = "centos/7"
+    consumer.vm.network :private_network, ip: "192.168.56.103"
+    #server.vm.network "public_network", bridge: "eno1", ip:"192.168.131.102", netmask: "255.255.255.0"
+    consumer.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "256","--cpus", "1", "--name", "sensu_server" ]
+    end
+    consumer.vm.provision "shell", path: "install-sensu-server.sh"
+  end
+end
