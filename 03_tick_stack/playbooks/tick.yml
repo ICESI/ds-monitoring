@@ -1,0 +1,46 @@
+---
+# Dependencies install
+- hosts: tickServer
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Insert entry to hosts file for testing
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ip_mirror }} icesi.mirror.edu.co"
+    - name: Copy icesi repo configuration
+      copy: 
+        src: ../templates/repo/icesi.repo
+        dest: /etc/yum.repos.d/icesi.repo
+        remote_src: no
+    - name: Run createrepo command
+      shell: yum repolist
+    - name: Clean all repos cache
+      shell: yum clean all
+    - name: Refresh icesi.repo
+      yum:
+        name: '*'
+        enablerepo: 'icesirepo'
+        disablerepo: '*'
+        state: latest
+    - name: List packages and register result to print with debug later.
+      yum:
+        list: available
+        enablerepo: 'icesirepo'
+        disablerepo: '*'
+      register: result
+
+---
+# TICK install
+- hosts: tickServer
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Install packages with multiple repos disabled
+      yum:
+        name: 
+          - nmap
+        enablerepo: 'icesirepo'
+        disablerepo: '*'
