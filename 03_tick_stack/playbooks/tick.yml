@@ -44,3 +44,114 @@
           - nmap
         enablerepo: 'icesirepo'
         disablerepo: '*'
+
+-----------
+
+https://docs.influxdata.com/platform/installation/oss-install
+
+cat <<EOF | sudo tee /etc/yum.repos.d/influxdb.repo
+[influxdb]
+name = InfluxDB Repository - RHEL \$releasever
+baseurl = https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable
+enabled = 1
+gpgcheck = 1
+gpgkey = https://repos.influxdata.com/influxdb.key
+EOF
+
+---------------
+
+sudo yum install influxdb
+sudo systemctl start influxdb 
+
+influx -precision rfc3339
+CREATE DATABASE mydb
+SHOW DATABASES
+USE mydb
+INSERT cpu,host=serverA,region=us_west value=0.64
+SELECT "host", "region", "value" FROM "cpu"
+INSERT temperature,machine=unit42,type=assembly external=25,internal=37
+
+#start with configuration file
+influxd -config /etc/influxdb/influxdb.conf
+
+--------------
+
+sudo yum install telegraf
+sudo systemctl start telegraf
+# create telegraf configuration file
+telegraf --input-filter cpu:mem:system --output-filter influxdb config > /etc/telegraf/telegraf.conf
+#urls = ["http://127.0.0.1:8086"]
+systemctl restart telegraf
+
+------------------
+
+yum install kapacitor
+sudo systemctl start kapacitor
+# create kapacitor configuration file
+kapacitord config > kapacitor.generated.conf
+
+--------------------
+
+yum install chronograf
+systemctl start chronograf
+
+--------------
+
+
+
+
+You can configure the logging module to output to syslog, see http://docs.python.org/library/logging.handlers.html#sysloghandler
+
+Simple example:
+
+from logging.handlers import SysLogHandler
+import logging
+
+logger = logging.getLogger()
+logger.addHandler(SysLogHandler('/dev/log'))
+logger.addHandler(logging.FileHandler("filename.log"))
+
+logging.warn("Hello world")
+
+The above logs to the local syslog using a Unix domain socket. You can also specify a hostname to log to syslog using UDP. See the docs for more info.
+
+-------
+
+import connexion
+from logging.config import dictConfig
+
+
+dictConfig({
+    'version': 1,
+    'handlers': {
+        'syslog': {
+        'class': 'logging.handlers.SysLogHandler'
+        }
+    },
+    'root': {
+       'handlers': ['syslog']
+    }
+})
+app = connexion.FlaskApp(__name__)
+app.app.logger.warn("I configured the flask logger!")
+app.add_api('swagger.yaml')
+app.run(port=8080)
+
+------------
+
+# References
+
+https://opensource.com/article/18/4/metrics-monitoring-and-python
+https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/
+https://medium.com/@andrei.chernyshev/prometheus-python-flask-8487c3bc5b36
+https://www.influxdata.com/blog/getting-started-python-influxdb/
+https://www.scalyr.com/blog/getting-started-quickly-with-flask-logging/
+https://github.com/abaratif/flaskfana
+https://www.datadoghq.com/es/blog/statsd/
+https://medium.com/@Magical_Mudit/monitoring-applications-using-statsd-telegraf-influxdb-and-grafana-19a80f501cad
+https://github.com/paksu/pytelegraf
+
+https://www.datadoghq.com/blog/monitoring-flask-apps-with-datadog/
+https://docs.newrelic.com/docs/agents/python-agent/getting-started/introduction-new-relic-python
+
+ISTIO
